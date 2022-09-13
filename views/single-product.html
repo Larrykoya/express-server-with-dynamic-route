@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Product</title>
+</head>
+<body>
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+  
+        .input-field {
+          padding: 5px;
+          margin-bottom: 3px;
+          width: 400px;
+        }
+        form {
+          width: 400px;
+        }
+  
+        .input-label {
+          display: block;
+        }
+  
+        button {
+          border: none;
+          padding: 8px;
+          border-radius: 2px;
+          /* width: 100%; */
+          background-color: gold;
+        }
+      </style>
+    <h1>
+        Product Details Page
+    </h1>
+    <div id="product-container"></div>
+    
+</body>
+<script>
+    let productId = window.location.pathname.split('/')[2];
+    let productDetails = '';
+    const productContainer = document.getElementById('product-container');
+    fetch('/api/product/' + productId)
+    .then((response) => response.json())
+    .then((data) => {
+        let product = data.product;
+        productDetails = data.product;
+        productContainer.innerHTML = `
+        <div>Product Id : ${product.id}</div>
+        <img 
+        src="${product.imageUrl}" 
+        height="400" 
+        width="600" 
+        alt="product image"
+        />
+        <div>name: ${product.name}</div>
+        <div>price: ${product.price}</div>
+        <div>quantity: ${product.quantity}</div>
+        
+        <button id="editBtn" onclick ="editForm()">Edit Product Details</button>
+        <button id="deleteBtn" onclick ="deleteForm()">Delete Product</button>
+        </br>
+
+        <a href="/product">Go to products</a>
+        
+        `;
+    });
+
+    editForm = () => {
+      // console.log(productDetails)
+            productContainer.innerHTML = 
+            `<form class="formUpdate" onsubmit="handleSubmit(event)">
+            <div>
+                <label class="input-label" for="url"> <strong>Image URL</strong> </label>
+                  <input
+                    class="input-field"
+                    name="url"
+                    value=${productDetails.imageUrl}
+                    type="url"
+                    id="url"
+                    placeholder= 'Enter Image URL'
+                  />
+            </div>
+            <div>
+                <label class="input-label" for="name"> <strong>Product Name</strong> </label>
+                  <input
+                    class="input-field"
+                    name="name"
+                    value=${productDetails.name}
+                    type="text"
+                    id="name"
+                    placeholder= 'Enter product name'
+                  />
+            </div>
+            <div>
+                <label class="input-label" for="price"> <strong>Product Price</strong> </label>
+                  <input
+                    class="input-field"
+                    name="price"
+                    value=${productDetails.price}
+                    type="number"
+                    id="price"
+                    placeholder= 'Enter price'
+                  />
+            </div>
+            <div>
+                <label class="input-label" for="quantity"> <strong>Quantity</strong> </label>
+                  <input
+                    class="input-field"
+                    name="quantity"
+                    value=${productDetails.quantity}
+                    type="number"
+                    id="quantity"
+                    placeholder= 'Enter quantity'
+                  />
+            </div>
+            <button>Update Product Details</button>
+            </form> `
+    };
+    deleteForm = () => {
+      fetch(`/api/product/${productDetails.id}`, {
+                headers:{
+                    'content-Type': 'application/json',
+                },
+                method: 'DELETE'});
+    }
+
+        const handleSubmit = (event) => {
+            // console.log(event);
+            event.preventDefault();
+            const url = event.target[0].value;
+            const name= event.target[1].value;
+            const price = event.target[2].value;
+            const quantity = event.target[3].value;
+
+            fetch(`/api/product/${productDetails.id}`, {
+                headers:{
+                    'content-Type': 'application/json',
+                },
+                method: 'PUT',
+                body: JSON.stringify({id: productDetails.id,url, name, price, quantity})
+            })
+            .then((res) => res.json())
+            .then((data)=>{
+                localStorage.setItem('product', JSON.stringify(data.product));
+                let updatedProduct = JSON.parse(localStorage.getItem('product'));
+                window.location.href = '/product';
+                // console.log(updatedProduct)
+                // window.location.href = '/api/product/:id';
+            });
+            
+        };
+    
+
+</script>
+</html>
