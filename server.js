@@ -114,9 +114,7 @@ server.put("/api/product/:id", (req, res) => {
   );
 
   if (products[productIndex]) {
-    // console.log(products[productIndex]);
     products[productIndex] = req.body;
-    // console.log(req.body);
     return res.status(200).send({ product: products });
   }
 });
@@ -126,7 +124,6 @@ server.delete("/api/product/:id", (req, res) => {
   );
 
   if (productIndex) {
-    // console.log(productIndex);
     products = productIndex;
     return res.status(200).send({ product: products });
   }
